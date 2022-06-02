@@ -34,7 +34,6 @@ exports.addTour = async (req, res) => {
   try {
     //Directly creates new document in collection
     const newTour = await tourModel.create(req.body);
-
     res.status(201).json({
       status: 'success',
       data: {

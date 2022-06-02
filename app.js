@@ -12,7 +12,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`)); //now root is public folder
 app.use((req, res, next) => {
-  console.log('Hello middleware 👋你妈시발');
+  console.log('Hello middleware');
   next();
 });
 app.use((req, res, next) => {
