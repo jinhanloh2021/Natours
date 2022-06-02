@@ -115,23 +115,24 @@ tourSchema.pre('save', function (next) {
 //   next();
 // });
 
+//
 //Query middleware, executes before all the methods that start with find
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-  this.start = Date.now();
+  // this.start = Date.now();
   next();
 });
 
 tourSchema.post(/^find/, function (docs, next) {
-  console.log(`Query took: ${Date.now() - this.start} ms`);
-  console.log(docs);
+  // console.log(`Query took: ${Date.now() - this.start} ms`);
+  // console.log(docs);
   next();
 });
 
 //Aggregation middleware
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } }); //Add match to the pipeline obj
-  console.log(this.pipeline());
+  // console.log(this.pipeline());
   next();
 });
 

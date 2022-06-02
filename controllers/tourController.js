@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Tour = require('../models/tourModel');
 const tourModel = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
@@ -7,18 +8,18 @@ const APIFeatures = require('../utils/apiFeatures');
 // );
 
 exports.getAllTours = async (req, res) => {
-  // /api/v1/tours?difficulty=easy&duration=5
+  // /api/v1/tours?difficulty=easy&duration=5&page=2  //have to remove the page=2
   // req.query -> { difficulty: 'easy', duration: '5' }
   // console.log(req.query);
   try {
-    // const queryObj = { ...req.query }; //shallow copy
+    // const queryObj = { ...req.query }; //shallow copy //...spread operator, expands the iterable into its elements.
     // const excludedFields = ['page', 'sort', 'limit', 'fields'];
     // excludedFields.forEach((el) => {
     //   delete queryObj[el];
     // });
+    // const { page, sort, limit, fields, ...queryObj } = req.query; //exclude fields from queryObj
 
     //Filtering
-    // const { page, sort, limit, fields, ...queryObj } = req.query; //exclude fields from queryObj
     // let queryStr = JSON.stringify(queryObj);
     // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     // let query = Tour.find(JSON.parse(queryStr)); //Tour is a collection. Tour.find() returns entire collection as an array. Can add filter object to method.
@@ -58,7 +59,7 @@ exports.getAllTours = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-    const tours = await features.query;
+    const tours = await features.query; //Returns JSON object
 
     // const tours = await Tour.find()
     //   .where('duration')
@@ -90,8 +91,15 @@ exports.aliasTopTours = async (req, res, next) => {
 
 exports.getSpecificTour = async (req, res) => {
   try {
+    //Using aggregation to get specific tour
+    // const tour = await Tour.aggregate([
+    //   {
+    //     $match: { _id: mongoose.Types.ObjectId(req.params.id) },
+    //   },
+    // ]);
     // Tour.findOne({ _id: req.params.id });
     const tour = await Tour.findById(req.params.id);
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -111,7 +119,7 @@ exports.addTour = async (req, res) => {
   // const newTour = new Tour({});
   // newTour.save()
   try {
-    //Directly creates new document in collection
+    //Directly creates new document in collection. (inserts new row in the table)
     const newTour = await tourModel.create(req.body);
     res.status(201).json({
       status: 'success',
@@ -184,6 +192,9 @@ exports.getTourStats = async (req, res) => {
         $sort: {
           avgPrice: 1, //1 for asc, -1 for desc
         },
+      },
+      {
+        $addFields: { difficulty: '$_id' },
       },
       // {
       //   $match: {

@@ -1,16 +1,20 @@
 class APIFeatures {
+  //query = Tours.find() = Mongoose.query Object that has no filter. The entire Tour collection.
+  //queryString = req.query = JSON { duration: { gte: '6' }, sort: 'duration,-price', page: '2' }
   constructor(query, queryString) {
     this.query = query;
     this.queryString = queryString;
   }
 
   filter() {
+    //removing page, sort, limit, fields from the queryString
+    //Add the dollar sign right before gte|gt|lte|lt
+    // { duration: { gte: '6' }, sort: 'duration,-price', page: '2' } -> { duration: { '$gte': '6' } }
     const { page, sort, limit, fields, ...queryObj } = this.queryString;
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
     this.query = this.query.find(JSON.parse(queryStr));
-    return this;
+    return this; //Mutates query object and returns mutated APIFeatures instance so we can chain methods.
   }
 
   sort() {
@@ -18,7 +22,7 @@ class APIFeatures {
       const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
     } else {
-      this.query = this.query.sort('-createdAt');
+      this.query = this.query.sort('-createdAt'); //default: sort by desc createdAt
     }
     return this;
   }
