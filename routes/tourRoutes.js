@@ -1,10 +1,7 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
-// const {getAllTours, addTour, getSpecificTour, patchSpecificTour, deleteSpecificTour} = require('./../controllers/tourController');
-const router = express.Router();
 
-//param middleware function. Validates ID.
-// router.param('id', tourController.checkID);
+const router = express.Router();
 
 router.route('/').get(tourController.getAllTours).post(tourController.addTour);
 

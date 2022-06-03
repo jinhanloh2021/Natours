@@ -7,14 +7,11 @@ class APIFeatures {
   }
 
   filter() {
-    //removing page, sort, limit, fields from the queryString
-    //Add the dollar sign right before gte|gt|lte|lt
-    // { duration: { gte: '6' }, sort: 'duration,-price', page: '2' } -> { duration: { '$gte': '6' } }
     const { page, sort, limit, fields, ...queryObj } = this.queryString;
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     this.query = this.query.find(JSON.parse(queryStr));
-    return this; //Mutates query object and returns mutated APIFeatures instance so we can chain methods.
+    return this;
   }
 
   sort() {
@@ -22,7 +19,7 @@ class APIFeatures {
       const sortBy = this.queryString.sort.split(',').join(' ');
       this.query = this.query.sort(sortBy);
     } else {
-      this.query = this.query.sort('-createdAt'); //default: sort by desc createdAt
+      this.query = this.query.sort('-createdAt');
     }
     return this;
   }
@@ -32,7 +29,7 @@ class APIFeatures {
       const fieldsString = this.queryString.fields.split(',').join(' ');
       this.query = this.query.select(fieldsString);
     } else {
-      this.query = this.query.select('-__v'); //excludes __v field.
+      this.query = this.query.select('-__v');
     }
     return this;
   }

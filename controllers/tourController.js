@@ -1,71 +1,16 @@
-const mongoose = require('mongoose');
 const Tour = require('../models/tourModel');
 const tourModel = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 
-// const tours = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-// );
-
 exports.getAllTours = async (req, res) => {
-  // /api/v1/tours?difficulty=easy&duration=5&page=2  //have to remove the page=2
-  // req.query -> { difficulty: 'easy', duration: '5' }
-  // console.log(req.query);
   try {
-    // const queryObj = { ...req.query }; //shallow copy //...spread operator, expands the iterable into its elements.
-    // const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    // excludedFields.forEach((el) => {
-    //   delete queryObj[el];
-    // });
-    // const { page, sort, limit, fields, ...queryObj } = req.query; //exclude fields from queryObj
-
-    //Filtering
-    // let queryStr = JSON.stringify(queryObj);
-    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    // let query = Tour.find(JSON.parse(queryStr)); //Tour is a collection. Tour.find() returns entire collection as an array. Can add filter object to method.
-
-    //Sorting
-    // if (typeof sort !== 'undefined') {
-    //   const sortBy = sort.split(',').join(' ');
-    //   query = query.sort(sortBy);
-    // } else {
-    //   query = query.sort('-createdAt');
-    // }
-
-    //Field limiting. Select which field of tour is sent.
-    // if (typeof fields !== 'undefined') {
-    //   const fieldsString = fields.split(',').join(' ');
-    //   query = query.select(fieldsString);
-    // } else {
-    //   query = query.select('-__v'); //excludes __v field.
-    // }
-
-    //Pagination
-    // const pageNumber = page * 1 || 1;
-    // const limitNumber = limit * 1 || 100;
-    // const skip = (pageNumber - 1) * limitNumber;
-
-    // //page=2&limit=10   page1: 1-10, page2: 11-20; So we skip(10) if we are on page 2.
-    // query = query.skip(skip).limit(limitNumber);
-
-    // if (typeof page !== 'undefined') {
-    //   const numTours = await Tour.countDocuments();
-    //   if (skip >= numTours) throw new Error('This page does not exist.');
-    // }
-
     //Execute Query
     const features = new APIFeatures(Tour.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    const tours = await features.query; //Returns JSON object
-
-    // const tours = await Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
+    const tours = await features.query;
 
     res.status(200).json({
       status: 'success',
@@ -91,13 +36,6 @@ exports.aliasTopTours = async (req, res, next) => {
 
 exports.getSpecificTour = async (req, res) => {
   try {
-    //Using aggregation to get specific tour
-    // const tour = await Tour.aggregate([
-    //   {
-    //     $match: { _id: mongoose.Types.ObjectId(req.params.id) },
-    //   },
-    // ]);
-    // Tour.findOne({ _id: req.params.id });
     const tour = await Tour.findById(req.params.id);
 
     res.status(200).json({
@@ -115,11 +53,7 @@ exports.getSpecificTour = async (req, res) => {
 };
 
 exports.addTour = async (req, res) => {
-  //Creates new document, then call .save() on the document to add to collection.
-  // const newTour = new Tour({});
-  // newTour.save()
   try {
-    //Directly creates new document in collection. (inserts new row in the table)
     const newTour = await tourModel.create(req.body);
     res.status(201).json({
       status: 'success',
@@ -178,8 +112,7 @@ exports.getTourStats = async (req, res) => {
       },
       {
         $group: {
-          // _id: '$ratingsAverage',
-          _id: { $toUpper: '$difficulty' }, //group by difficulty
+          _id: { $toUpper: '$difficulty' },
           numTours: { $sum: 1 },
           numRatings: { $sum: '$ratingsQuantity' },
           avgRating: { $avg: '$ratingsAverage' },
@@ -190,17 +123,12 @@ exports.getTourStats = async (req, res) => {
       },
       {
         $sort: {
-          avgPrice: 1, //1 for asc, -1 for desc
+          avgPrice: 1,
         },
       },
       {
         $addFields: { difficulty: '$_id' },
       },
-      // {
-      //   $match: {
-      //     _id: { $ne: 'EASY' },
-      //   },
-      // },
     ]);
     res.status(200).json({
       status: 'success',
