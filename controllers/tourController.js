@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const tourModel = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllTours = catchAsync(async (req, res, next) => {
@@ -30,6 +31,10 @@ exports.aliasTopTours = async (req, res, next) => {
 
 exports.getSpecificTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
+  if (!tour) {
+    next(new AppError('Invalid ID.', 404));
+    return;
+  }
 
   res.status(200).json({
     status: 'success',
@@ -56,6 +61,11 @@ exports.patchSpecificTour = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
+  if (!tour) {
+    next(new AppError('Invalid ID.', 404));
+    return;
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -65,7 +75,12 @@ exports.patchSpecificTour = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteSpecificTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+  if (!tour) {
+    next(new AppError('Invalid ID.', 404));
+    return;
+  }
+
   res.status(204).json({
     status: 'success',
     data: null,
