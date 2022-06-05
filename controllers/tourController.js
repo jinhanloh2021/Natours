@@ -1,5 +1,4 @@
 const Tour = require('../models/tourModel');
-const tourModel = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
@@ -47,7 +46,7 @@ exports.getSpecificTour = catchAsync(async (req, res, next) => {
 //calls catchAsync and returns a function. Function not called, just returned.
 //Only when addTour() then the returned function is called.
 exports.addTour = catchAsync(async (req, res, next) => {
-  const newTour = await tourModel.create(req.body);
+  const newTour = await Tour.create(req.body);
   res.status(201).json({
     status: 'success',
     data: {
