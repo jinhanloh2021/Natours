@@ -59,13 +59,14 @@ app.use((req, res, next) => {
   next();
 });
 
+//Mounting routers
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-//Will reach here if other routers do not catch the request. Can handle uncaught requests here.
+//Will reach here if other routers do not catch the request. Can handle unknown route requests here.
 //.all for all http methods, '*' is a wildcard to catch all other urls
 app.all('*', (req, res, next) => {
-  next(new AppError(`Cannot find ${req.originalUrl}`, 404)); //express assumes that whatever we pass into next is an error.
+  next(new AppError(`Cannot find ${req.originalUrl}`, 404));
 });
 
 //Global error handler middleware function

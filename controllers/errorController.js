@@ -1,5 +1,6 @@
 const AppError = require('../utils/appError');
 
+//Error handler for errors from Mongoose, and from JWT.
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
@@ -50,6 +51,7 @@ const sendErrorProd = (err, res) => {
   }
 };
 
+//this function prototype (err, req, res, next) indicates that this is the global error controller.
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
