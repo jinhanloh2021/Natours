@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
       validator: function (el) {
         return el === this.password; //checks if password === passwordConfirm
       },
-      message: 'Passwords do not match.',
+      message: 'Error. Passwords do not match.',
     },
   },
   passwordResetToken: {

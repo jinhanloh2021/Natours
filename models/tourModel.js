@@ -46,8 +46,8 @@ const tourSchema = new mongoose.Schema(
     ratingsAverage: {
       type: Number,
       default: 2.5,
-      min: [1, 'Minimum rating is 1.0'],
-      max: [5, 'Maximum rating is 5.0'],
+      min: [1, '{VALUE} is lower than the minimum rating 1.0'],
+      max: [5, '{VALUE} is higher than the maximum rating is 5.0'],
     },
     ratingsQuantity: {
       type: Number,
@@ -92,15 +92,21 @@ const tourSchema = new mongoose.Schema(
     },
   },
   {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toJSON: { virtuals: true }, // Make Mongoose attach virtuals whenever calling `JSON.stringify()`. Will add virtual { durationWeeks: 4 } to output.
+    toObject: { virtuals: true }, //Attach virtuals when toObject called.
   }
 );
 
-tourSchema.virtual('durationWeeks').get(function () {
-  return this.duration / 7;
-});
+tourSchema //creates virtual field. Defines getter and setter of virtual field.
+  .virtual('durationWeeks')
+  .get(function () {
+    return this.duration / 7;
+  })
+  .set(function (durationInWeeks) {
+    this.duration = durationInWeeks * 7;
+  });
 
+//Tour Schema MIDDLEWARE functions
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
@@ -124,6 +130,7 @@ tourSchema.pre('aggregate', function (next) {
   next();
 });
 
+//mongoose.model() uses default mongoose connection. If have custom connection, should use customConnection.connect().
 const Tour = mongoose.model('Tour', tourSchema, 'tours');
 
 module.exports = Tour;
