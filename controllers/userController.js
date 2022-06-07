@@ -3,7 +3,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./factoryController');
 
-//Takes in object, {a: "", b: "", c: ""}, filters for [a, b], returns {a: "", b: ""}
+//Private func //Takes in object, {a: "", b: "", c: ""}, filters for [a, b], returns {a: "", b: ""}
 const filterObj = (obj, ...allowedFields) => {
   const filteredObj = {};
   Object.keys(obj).forEach((el) => {
@@ -54,11 +54,13 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
+//Route not implemented. Redirect to /signup
 exports.addUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not defined. Pleas use /signup instead.',
-  });
+  res.redirect(307, '/api/v1/users/signup');
+  // res.status(500).json({
+  //   status: 'error',
+  //   message: 'This route is not defined. Please use /v1/users/signup instead.',
+  // });
 };
 
 exports.getAllUsers = factory.getAll(User);

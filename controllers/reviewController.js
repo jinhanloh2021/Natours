@@ -17,7 +17,7 @@ exports.setTourId = (req, res, next) => {
   next();
 };
 
-exports.getAllReviews = factory.getAll(Review);
+exports.getAllReviews = factory.getAll(Review); //middleware before this solves the tourId specified issue.
 exports.getSpecificReview = factory.getOne(Review);
 exports.addReview = factory.createOne(Review);
 exports.patchSpecificReview = factory.updateOne(Review);

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
+// const validator = require('validator');
 const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
@@ -128,6 +128,10 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true }, //Attach virtuals when toObject called.
   }
 );
+
+// tourSchema.index({ price: 1 }); //build an index on price, in asc order. Note that price is not a candidate key.
+tourSchema.index({ price: 1, ratingsAverage: -1 }); //build index on price asc, then on ratings dsc
+tourSchema.index({ slug: 1 });
 
 tourSchema //creates virtual field. Defines getter and setter of virtual field.
   .virtual('durationWeeks')
