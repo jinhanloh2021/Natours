@@ -9,6 +9,7 @@ const AppError = require('./utils/appError');
 const globalErrorController = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -62,6 +63,7 @@ app.use((req, res, next) => {
 //Mounting routers
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 //Will reach here if other routers do not catch the request. Can handle unknown route requests here.
 //.all for all http methods, '*' is a wildcard to catch all other urls

@@ -115,7 +115,13 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
+    // guides: Array //for Embedding user inside tourModel
   },
   {
     toJSON: { virtuals: true }, // Make Mongoose attach virtuals whenever calling `JSON.stringify()`. Will add virtual { durationWeeks: 4 } to output.
@@ -146,15 +152,19 @@ tourSchema.pre('save', async function (next) {
   next();
 });
 
+//Ensure that secretTours are not found
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-  // this.start = Date.now();
+  // this.where('secretTour').$ne(true); //mongoose method
   next();
 });
 
-tourSchema.post(/^find/, function (docs, next) {
-  // console.log(`Query took: ${Date.now() - this.start} ms`);
-  // console.log(docs);
+//Ensure that guide references are populated.
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
   next();
 });
 
