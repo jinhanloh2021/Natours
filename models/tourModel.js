@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -90,6 +91,31 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      //GeoJSON to specify geospatial data
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number], //[longitude, latitude]
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: Array,
   },
   {
     toJSON: { virtuals: true }, // Make Mongoose attach virtuals whenever calling `JSON.stringify()`. Will add virtual { durationWeeks: 4 } to output.
@@ -109,6 +135,14 @@ tourSchema //creates virtual field. Defines getter and setter of virtual field.
 //Tour Schema MIDDLEWARE functions
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+//Embedding middleware. To embed guides inside our Tour when we create new docs.
+tourSchema.pre('save', async function (next) {
+  //for each id in this.guides, find User promise. Then with the array of promises, await all.
+  const guidesPromises = this.guides.map(async (id) => User.findById(id));
+  this.guides = await Promise.all(guidesPromises);
   next();
 });
 
