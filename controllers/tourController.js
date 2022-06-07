@@ -1,90 +1,20 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./factoryController');
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  //Execute Query
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
+exports.getAllTours = factory.getAll(Tour);
+exports.getSpecificTour = factory.getOne(Tour, { path: 'reviews' });
+exports.addTour = factory.createOne(Tour);
+exports.patchSpecificTour = factory.updateOne(Tour);
+exports.deleteSpecificTour = factory.deleteOne(Tour);
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tours,
-    },
-  });
-});
-
-//middleware func
+//middleware func. For route (GET /top-5-cheap)
 exports.aliasTopTours = async (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
-
-exports.getSpecificTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-  if (!tour) {
-    next(new AppError('Invalid ID.', 404));
-    return;
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
-//calls catchAsync and returns a function. Function not called, just returned.
-//Only when addTour() then the returned function is called.
-exports.addTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
-});
-
-exports.patchSpecificTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!tour) {
-    next(new AppError('Invalid ID.', 404));
-    return;
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
-exports.deleteSpecificTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  if (!tour) {
-    next(new AppError('Invalid ID.', 404));
-    return;
-  }
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([

@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./factoryController');
 
 //Takes in object, {a: "", b: "", c: ""}, filters for [a, b], returns {a: "", b: ""}
 const filterObj = (obj, ...allowedFields) => {
@@ -11,44 +12,10 @@ const filterObj = (obj, ...allowedFields) => {
   return filteredObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: 'Success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
+exports.getMe = catchAsync(async (req, res, next) => {
+  req.params.id = req.user.id;
+  next(); //call getOne() after this middleware.
 });
-
-exports.addUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet implemented.',
-  });
-};
-
-exports.getSpecificUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet implemented.',
-  });
-};
-
-exports.patchSpecificUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet implemented.',
-  });
-};
-
-exports.deleteSpecificUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'Route not yet implemented.',
-  });
-};
 
 //User functions. (Need to be logged in as a user to use these functions)
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -62,7 +29,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
     return;
   }
-
   // 2) Remove unwanted fields such as "role". Include only updatable fields.
   const filteredBody = filterObj(req.body, 'name', 'email');
   // 3) Update user document
@@ -87,3 +53,16 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.addUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not defined. Pleas use /signup instead.',
+  });
+};
+
+exports.getAllUsers = factory.getAll(User);
+exports.getSpecificUser = factory.getOne(User);
+//cannot use factory.createOne(User), because already have SignUp which takes care of password and security.
+exports.patchSpecificUser = factory.updateOne(User); //don't update passwords with this
+exports.deleteSpecificUser = factory.deleteOne(User);
