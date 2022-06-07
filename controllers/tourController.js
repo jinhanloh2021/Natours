@@ -29,7 +29,7 @@ exports.aliasTopTours = async (req, res, next) => {
 };
 
 exports.getSpecificTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
   if (!tour) {
     next(new AppError('Invalid ID.', 404));
     return;

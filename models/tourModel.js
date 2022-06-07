@@ -138,6 +138,13 @@ tourSchema //creates virtual field. Defines getter and setter of virtual field.
     this.duration = durationInWeeks * 7;
   });
 
+//virtual populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', //The local '_id' is stored in the foreign 'reviewMode.tour'
+  localField: '_id',
+});
+
 //Tour Schema MIDDLEWARE functions
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });

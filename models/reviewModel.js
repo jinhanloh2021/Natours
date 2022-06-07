@@ -34,16 +34,14 @@ const reviewSchema = new mongoose.Schema(
 
 //MIDDLEWARE
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: 'tour',
+  //   select: ['name'],
+  // })
   this.populate({
-    path: 'tour',
-    select: ['name'],
-  })
-    .populate({
-      path: 'user',
-      select: ['name', 'email'],
-    })
-    .select('-__v -createdAt');
-
+    path: 'user',
+    select: ['name', 'email'],
+  }).select('-__v -createdAt');
   next();
 });
 
