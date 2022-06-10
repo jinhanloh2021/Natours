@@ -32,6 +32,8 @@ router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
   .get(tourController.getToursWithin); // /tours-within/distance=233&center=40,45&unit=miles querystring is another way
 
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 router
   .route('/:id')
   .get(tourController.getSpecificTour)
