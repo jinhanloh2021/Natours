@@ -133,6 +133,7 @@ const tourSchema = new mongoose.Schema(
 // tourSchema.index({ price: 1 }); //build an index on price, in asc order. Note that price is not a candidate key.
 tourSchema.index({ price: 1, ratingsAverage: -1 }); //build index on price asc, then on ratings dsc
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema //creates virtual field. Defines getter and setter of virtual field.
   .virtual('durationWeeks')
