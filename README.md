@@ -1,5 +1,5 @@
 # Natours
-Project for node.js
+Project to learn node.js backend with MongoDB NoSQL database.
 
 ### Git Network Commands
 Get remote repository name and url
