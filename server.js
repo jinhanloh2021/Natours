@@ -1,11 +1,36 @@
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: './config.env' }); //sets environment variables
+//final safety net for syncrhonous uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.log('Uncaught exception.');
+  console.log(err.message, err.name);
+  process.exit(1);
+});
+
+dotenv.config({ path: './config.env' });
 const app = require('./app');
 
-const PORT = process.env.PORT;
-// console.log(process.env);
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
+mongoose.connect(DB).then(() => {
+  console.log('Database connected.');
+});
 
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+
+const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
+});
+
+//final safety net for errors from async functions.
+process.on('unhandledRejection', (err) => {
+  console.log('Unhandled rejection.');
+  console.log(err);
+
+  server.close(() => {
+    process.exit(1); //end application. Exit with code 1 means error.
+  });
 });
